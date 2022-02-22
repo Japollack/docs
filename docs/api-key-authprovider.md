@@ -195,7 +195,7 @@ class AppHost : AppSelfHostBase
 
     public override void Configure(Container container)
     {
-        //Create and register an OrmLite DB Factory configured to use Live DB by default 
+        // Create and register an OrmLite DB Factory configured to use Live DB by default 
         var dbFactory = new OrmLiteConnectionFactory(
             AppSettings.GetString("LiveDb"), SqlServerDialect.Provider);
 
@@ -205,19 +205,19 @@ class AppHost : AppSelfHostBase
         dbFactory.RegisterConnection("TestDb", 
             AppSettings.GetString("TestDb"), SqlServerDialect.Provider);
 
-        //Tell ServiceStack you want to persist User Auth Info in SQL Server
+        // Tell ServiceStack you want to persist User Auth Info in SQL Server
         container.Register<IAuthRepository>(c => new OrmLiteAuthRepository(dbFactory));
         
-        //Register the AuthFeature with the API Key Auth Provider 
+        // Register the AuthFeature with the API Key Auth Provider
         Plugins.Add(new AuthFeature(() => new AuthUserSession(),
             new IAuthProvider[] {
                 new ApiKeyAuthProvider(AppSettings)
-            });
+            }));
     }
     
     public override IDbConnection GetDbConnection(IRequest req = null)
     {
-        //If an API Test Key was used return DB connection to TestDb instead: 
+        // If an API Test Key was used return DB connection to TestDb instead: 
         return req.GetApiKey()?.Environment == "test"
             ? TryResolve<IDbConnectionFactory>().OpenDbConnection("TestDb")
             : base.GetDbConnection(req);
